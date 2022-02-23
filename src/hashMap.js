@@ -6,7 +6,7 @@ const HashMap = {
   },
   // eslint-disable-next-line no-unused-vars
   get: (key) => {
-    return 'value'
+    return null
   },
 }
 

@@ -37,13 +37,14 @@ tap.test('HashMap - set', test => {
 })
 
 tap.test('HashMap - get', test => {
-  test.test('get a value', testCase => {
-    const expectedResult = 'value'
+  test.test('get a non existing value', testCase => {
+    const expectedResult = null
 
     const actualResult = HashMap.get('key')
 
     testCase.equal(actualResult, expectedResult)
     testCase.end()
   })
+
   test.end()
 })
