@@ -2,7 +2,7 @@
 
 const HashMap = {
   set: () => {
-    return ''
+    return 'value'
   },
 }
 
