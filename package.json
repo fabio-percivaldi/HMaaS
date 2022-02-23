@@ -21,6 +21,7 @@
   "dependencies": {
     "express": "^4.17.3",
     "pino": "^7.8.0",
+    "supertest": "^6.2.2",
     "tap": "^15.1.6"
   }
 }
