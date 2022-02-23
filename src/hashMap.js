@@ -1,8 +1,8 @@
 'use strict'
 
 const HashMap = {
-  set: () => {
-    return 'value'
+  set: (key, value) => {
+    return value
   },
 }
 

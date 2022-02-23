@@ -12,5 +12,14 @@ tap.test('HashMap - set', test => {
     testCase.equal(actualResult, expectedResult)
     testCase.end()
   })
+
+  test.test('set a different value', testCase => {
+    const expectedResult = 'different_value'
+
+    const actualResult = HashMap.set('key', 'different_value')
+
+    testCase.equal(actualResult, expectedResult)
+    testCase.end()
+  })
   test.end()
 })
