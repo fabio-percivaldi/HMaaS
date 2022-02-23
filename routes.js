@@ -10,8 +10,8 @@ router.post('/set', (req, res) => {
   res.status(204).send()
 })
 
-router.get('/get', (req, res) => {
-  res.status(200).send('value')
+router.get('/get/:key', (req, res) => {
+  res.status(200).send('value1')
 })
 
 module.exports = router
