@@ -3,7 +3,9 @@
 const tap = require('tap')
 const routes = require('../routes')
 const express = require('express')
+const bodyParser = require('body-parser')
 const app = express()
+app.use(bodyParser.json())
 
 const request = require('supertest')
 
@@ -12,7 +14,8 @@ tap.test('HashMap - set and get', test => {
     app.use(routes)
     const response = await request(app)
       .post('/set')
-      .send({})
+      .send({ key: 'key1', value: 'value1' })
+      .set('Accept', 'application/json')
 
     testCase.equal(response.status, 204)
     testCase.end()
@@ -24,6 +27,7 @@ tap.test('HashMap - set and get', test => {
     await request(app)
       .post('/set')
       .send({ key, value: 'value1' })
+      .set('Accept', 'application/json')
 
     const response = await request(app)
       .get(`/get/${key}`)
