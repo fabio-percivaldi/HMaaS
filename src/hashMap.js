@@ -3,15 +3,15 @@
 let savedValue
 class HashMap {
   constructor() {
-    savedValue = null
+    savedValue = []
   }
   set(key, value) {
-    savedValue = value
+    savedValue[key] = value
     return value
   }
   // eslint-disable-next-line no-unused-vars
   get(key) {
-    return savedValue
+    return savedValue[key] || null
   }
 }
 
