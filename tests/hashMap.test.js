@@ -35,3 +35,15 @@ tap.test('HashMap - set', test => {
   })
   test.end()
 })
+
+tap.test('HashMap - get', test => {
+  test.test('get a value', testCase => {
+    const expectedResult = 'value'
+
+    const actualResult = HashMap.get('key')
+
+    testCase.equal(actualResult, expectedResult)
+    testCase.end()
+  })
+  test.end()
+})
