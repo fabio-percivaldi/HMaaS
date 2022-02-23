@@ -64,6 +64,22 @@ tap.test('HashMap - set and get - ', test => {
     testCase.end()
   })
 
+  test.test('set two different values and get it', testCase => {
+    const expectedResult1 = 'value1'
+    const expectedResult2 = 'value2'
+
+    const hashMap = new HashMap()
+    hashMap.set('key1', 'value1')
+    hashMap.set('key2', 'value2')
+
+    const actualResult1 = hashMap.get('key1')
+    const actualResult2 = hashMap.get('key2')
+
+    testCase.equal(actualResult1, expectedResult1)
+    testCase.equal(actualResult2, expectedResult2)
+    testCase.end()
+  })
+
   test.end()
 })
 
