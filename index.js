@@ -4,6 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const swaggerUi = require('swagger-ui-express')
 const swaggerDocument = require('./swagger.json')
+const basicAuth = require('express-basic-auth')
 
 const app = express()
 const port = 3000
@@ -11,6 +12,9 @@ const logger = require('pino')()
 const routes = require('./routes')
 
 app.use(bodyParser.json())
+app.use(basicAuth({
+  users: { 'user': 'password' },
+}))
 app.use(routes)
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
