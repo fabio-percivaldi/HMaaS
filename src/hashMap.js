@@ -1,19 +1,13 @@
 'use strict'
-const { createClient } = require('redis')
 class HashMap {
-  constructor(conf) {
-    const {
-      REDIS_URL,
-    } = conf
-
-    this.redisClient = createClient({
-      url: REDIS_URL,
-    })
+  constructor(redis) {
+    this.redisClient = redis
   }
 
   async flushAll() {
     await this.redisClient.flushAll()
   }
+
   async connect() {
     await this.redisClient.connect()
   }
@@ -29,7 +23,7 @@ class HashMap {
     await this.redisClient.set(key, JSON.stringify({ value, user: inputUser }))
     return value
   }
-  // eslint-disable-next-line no-unused-vars
+
   async get(key, inputUser) {
     if (!inputUser) {
       throw new Error('Input user cannot be empty')

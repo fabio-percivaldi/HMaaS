@@ -3,7 +3,6 @@
 const express = require('express')
 const router = express.Router()
 const HashMap = require('./src/hashMap.js')
-const hashMap = new HashMap()
 const logger = require('pino')()
 const { body: bodyValidator, validationResult } = require('express-validator')
 
@@ -16,39 +15,44 @@ const getUser = (headers) => {
   return basicAuthDecoded.split(':')[0]
 }
 
-router.post('/set',
-  bodyValidator('key').isString()
-    .notEmpty(),
-  bodyValidator('value').isString()
-    .notEmpty(),
-  (req, res) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() })
-    }
-    const { body, headers } = req
-    logger.info('Request body', JSON.stringify(body))
-    const { key, value } = body
+module.exports = async(redis) => {
+  const hashMap = new HashMap(redis)
+  await hashMap.connect()
 
+  router.post('/set',
+    bodyValidator('key').isString()
+      .notEmpty(),
+    bodyValidator('value').isString()
+      .notEmpty(),
+    (req, res) => {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+      }
+      const { body, headers } = req
+      logger.info('Request body', JSON.stringify(body))
+      const { key, value } = body
+
+      const user = getUser(headers)
+      logger.info({ value, key, user }, 'SET value')
+
+      hashMap.set(key, value, user)
+
+      res.status(204).send()
+    })
+
+  router.get('/get/:key', async(req, res) => {
+    const { params, headers } = req
     const user = getUser(headers)
 
-    logger.info('User', { user })
-    hashMap.set(key, value, user)
+    const value = await hashMap.get(params.key, user)
+    logger.info({ value, key: params.key, user }, 'GET value')
 
-    res.status(204).send()
+    if (!value) {
+      res.status(404).send()
+      return
+    }
+    res.status(200).send(value)
   })
-
-router.get('/get/:key', (req, res) => {
-  const { params, headers } = req
-  const user = getUser(headers)
-
-  const value = hashMap.get(params.key, user)
-
-  if (!value) {
-    res.status(404).send()
-    return
-  }
-  res.status(200).send(value)
-})
-
-module.exports = router
+  return router
+}
