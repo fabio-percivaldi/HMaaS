@@ -1,27 +1,44 @@
 'use strict'
-
-let savedValue
+const { createClient } = require('redis')
 class HashMap {
-  constructor() {
-    savedValue = []
+  constructor(conf) {
+    const {
+      REDIS_URL,
+    } = conf
+
+    this.redisClient = createClient({
+      url: REDIS_URL,
+    })
   }
-  set(key, value, inputUser) {
+
+  async flushAll() {
+    await this.redisClient.flushAll()
+  }
+  async connect() {
+    await this.redisClient.connect()
+  }
+
+  async disconnect() {
+    await this.redisClient.disconnect()
+  }
+
+  async set(key, value, inputUser) {
     if (!inputUser) {
       throw new Error('Input user cannot be empty')
     }
-    savedValue[key] = { value, user: inputUser }
+    await this.redisClient.set(key, JSON.stringify({ value, user: inputUser }))
     return value
   }
   // eslint-disable-next-line no-unused-vars
-  get(key, inputUser) {
+  async get(key, inputUser) {
     if (!inputUser) {
       throw new Error('Input user cannot be empty')
     }
-    const foundValue = savedValue[key]
+    const foundValue = await this.redisClient.get(key)
     if (!foundValue) {
       return null
     }
-    const { value, user } = foundValue
+    const { value, user } = JSON.parse(foundValue)
     if (inputUser !== user) {
       return null
     }
