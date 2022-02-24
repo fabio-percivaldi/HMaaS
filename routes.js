@@ -13,7 +13,7 @@ const getUser = (headers) => {
 
   const buff = Buffer.from(basicAuth, 'base64')
   const basicAuthDecoded = buff.toString('ascii')
-  return basicAuthDecoded.split(':')[1]
+  return basicAuthDecoded.split(':')[0]
 }
 
 router.post('/set',
@@ -44,6 +44,10 @@ router.get('/get/:key', (req, res) => {
 
   const value = hashMap.get(params.key, user)
 
+  if (!value) {
+    res.status(404).send()
+    return
+  }
   res.status(200).send(value)
 })
 

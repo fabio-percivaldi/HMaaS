@@ -16,6 +16,7 @@ app.use(bodyParser.json())
 
 const request = require('supertest')
 const user1Auth = 'dXNlcjpwYXNzd29yZA=='
+const user2Auth = 'dXNlcjI6cGFzc3dvcmQy'
 
 tap.test('HashMap', test => {
   test.test('set a value', async testCase => {
@@ -79,6 +80,24 @@ tap.test('HashMap - basic auth', async test => {
 
     testCase.equal(response.status, 200)
     testCase.equal(response.text, 'value1')
+
+    testCase.end()
+  })
+
+  test.test('user1 cannot get user2 values', async testCase => {
+    const key = 'key1'
+    app.use(routes)
+    await request(app)
+      .post('/set')
+      .send({ key, value: 'value1' })
+      .set('Accept', 'application/json')
+      .set('Authorization', `Basic ${user1Auth}`)
+
+    const response = await request(app)
+      .get(`/get/${key}`)
+      .set('Authorization', `Basic ${user2Auth}`)
+
+    testCase.equal(response.status, 404)
 
     testCase.end()
   })
