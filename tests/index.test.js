@@ -7,21 +7,24 @@ const basicAuth = require('express-basic-auth')
 const bodyParser = require('body-parser')
 const app = express()
 app.use(basicAuth({
-  users: { 'user': 'password' },
+  users: {
+    'user': 'password',
+    'user2': 'password2',
+  },
 }))
 app.use(bodyParser.json())
 
 const request = require('supertest')
-const userPassword = 'dXNlcjpwYXNzd29yZA=='
+const user1Auth = 'dXNlcjpwYXNzd29yZA=='
 
-tap.test('HashMap - set and get', test => {
+tap.test('HashMap', test => {
   test.test('set a value', async testCase => {
     app.use(routes)
     const response = await request(app)
       .post('/set')
       .send({ key: 'key1', value: 'value1' })
       .set('Accept', 'application/json')
-      .set('Authorization', `Basic ${userPassword}`)
+      .set('Authorization', `Basic ${user1Auth}`)
 
     testCase.equal(response.status, 204)
     testCase.end()
@@ -34,11 +37,11 @@ tap.test('HashMap - set and get', test => {
       .post('/set')
       .send({ key, value: 'value1' })
       .set('Accept', 'application/json')
-      .set('Authorization', `Basic ${userPassword}`)
+      .set('Authorization', `Basic ${user1Auth}`)
 
     const response = await request(app)
       .get(`/get/${key}`)
-      .set('Authorization', `Basic ${userPassword}`)
+      .set('Authorization', `Basic ${user1Auth}`)
 
     testCase.equal(response.status, 200)
     testCase.equal(response.text, 'value1')
@@ -48,15 +51,37 @@ tap.test('HashMap - set and get', test => {
   test.end()
 })
 
+tap.test('HashMap - basic auth', async test => {
+  test.test('unauthorized get', async testCase => {
+    const key = 'key1'
 
-tap.test('HashMap - unauthorized get', async test => {
-  const key = 'key1'
+    app.use(routes)
 
-  app.use(routes)
+    const response = await request(app)
+      .get(`/get/${key}`)
 
-  const response = await request(app)
-    .get(`/get/${key}`)
+    testCase.equal(response.status, 401)
+    testCase.end()
+  })
 
-  test.equal(response.status, 401)
+  test.test('user can get his own value', async testCase => {
+    const key = 'key1'
+    app.use(routes)
+    await request(app)
+      .post('/set')
+      .send({ key, value: 'value1' })
+      .set('Accept', 'application/json')
+      .set('Authorization', `Basic ${user1Auth}`)
+
+    const response = await request(app)
+      .get(`/get/${key}`)
+      .set('Authorization', `Basic ${user1Auth}`)
+
+    testCase.equal(response.status, 200)
+    testCase.equal(response.text, 'value1')
+
+    testCase.end()
+  })
+
   test.end()
 })

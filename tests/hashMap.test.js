@@ -7,7 +7,7 @@ tap.test('HashMap - set', test => {
   test.test('set a value', testCase => {
     const expectedResult = 'value'
     const hashMap = new HashMap()
-    const actualResult = hashMap.set('key', 'value')
+    const actualResult = hashMap.set('key', 'value', 'user1')
 
     testCase.equal(actualResult, expectedResult)
     testCase.end()
@@ -17,7 +17,7 @@ tap.test('HashMap - set', test => {
     const expectedResult = 'different_value'
 
     const hashMap = new HashMap()
-    const actualResult = hashMap.set('key', 'different_value')
+    const actualResult = hashMap.set('key', 'different_value', 'user1')
 
     testCase.equal(actualResult, expectedResult)
     testCase.end()
@@ -28,11 +28,20 @@ tap.test('HashMap - set', test => {
     const expectedResult2 = 'value2'
 
     const hashMap = new HashMap()
-    const actualResult1 = hashMap.set('key', 'value1')
-    const actualResult2 = hashMap.set('key', 'value2')
+    const actualResult1 = hashMap.set('key', 'value1', 'user1')
+    const actualResult2 = hashMap.set('key', 'value2', 'user1')
 
     testCase.equal(actualResult1, expectedResult1)
     testCase.equal(actualResult2, expectedResult2)
+    testCase.end()
+  })
+
+  test.test('set a value with user', testCase => {
+    const expectedResult = 'value'
+    const hashMap = new HashMap()
+    const actualResult = hashMap.set('key', 'value', 'user1')
+
+    testCase.equal(actualResult, expectedResult)
     testCase.end()
   })
   test.end()
@@ -43,7 +52,7 @@ tap.test('HashMap - get', test => {
     const expectedResult = null
 
     const hashMap = new HashMap()
-    const actualResult = hashMap.get('key')
+    const actualResult = hashMap.get('key', 'user1')
 
     testCase.equal(actualResult, expectedResult)
     testCase.end()
@@ -57,8 +66,8 @@ tap.test('HashMap - set and get - ', test => {
     const expectedResult = 'value'
 
     const hashMap = new HashMap()
-    hashMap.set('key', 'value')
-    const actualResult = hashMap.get('key')
+    hashMap.set('key', 'value', 'user1')
+    const actualResult = hashMap.get('key', 'user1')
 
     testCase.equal(actualResult, expectedResult)
     testCase.end()
@@ -69,17 +78,27 @@ tap.test('HashMap - set and get - ', test => {
     const expectedResult2 = 'value2'
 
     const hashMap = new HashMap()
-    hashMap.set('key1', 'value1')
-    hashMap.set('key2', 'value2')
+    hashMap.set('key1', 'value1', 'user1')
+    hashMap.set('key2', 'value2', 'user1')
 
-    const actualResult1 = hashMap.get('key1')
-    const actualResult2 = hashMap.get('key2')
+    const actualResult1 = hashMap.get('key1', 'user1')
+    const actualResult2 = hashMap.get('key2', 'user1')
 
     testCase.equal(actualResult1, expectedResult1)
     testCase.equal(actualResult2, expectedResult2)
     testCase.end()
   })
 
+  test.test('set a value with user and get it with wrong user', testCase => {
+    const expectedResult = null
+
+    const hashMap = new HashMap()
+    hashMap.set('key', 'value', 'user1')
+    const actualResult = hashMap.get('key', 'user2')
+
+    testCase.equal(actualResult, expectedResult)
+    testCase.end()
+  })
   test.end()
 })
 
