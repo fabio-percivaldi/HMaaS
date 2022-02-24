@@ -1,7 +1,16 @@
 'use strict'
 
 const tap = require('tap')
+const { createClient } = require('redis')
 const HashMap = require('../src/hashMap')
+const conf = require('./conf.js')
+
+const {
+  REDIS_URL,
+} = conf
+const redisClient = createClient({
+  url: REDIS_URL,
+})
 
 tap.test('HashMap - set', test => {
   test.test('set a value', testCase => {
@@ -98,6 +107,29 @@ tap.test('HashMap - set and get - ', test => {
 
     testCase.equal(actualResult, expectedResult)
     testCase.end()
+  })
+  test.end()
+})
+
+
+tap.test('HashMap - Redis persistency', async test => {
+  await redisClient.connect()
+
+  test.test('value is stored in Redis', async testCase => {
+    const key = 'key1'
+    const value = 'value1'
+
+    const hashMap = new HashMap()
+    hashMap.set(key, value, 'user1')
+
+    const redisValue = await redisClient.get(key)
+
+    testCase.equal(redisValue, value)
+    testCase.end()
+  })
+
+  test.teardown(async() => {
+    await redisClient.disconnect()
   })
   test.end()
 })

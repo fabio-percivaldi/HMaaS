@@ -1,10 +1,11 @@
 'use strict'
 
-const tap = require('tap')
-const routes = require('../routes')
-const express = require('express')
 const basicAuth = require('express-basic-auth')
 const bodyParser = require('body-parser')
+const routes = require('../routes')
+const express = require('express')
+const tap = require('tap')
+
 const app = express()
 app.use(basicAuth({
   users: {
