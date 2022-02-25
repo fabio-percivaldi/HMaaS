@@ -17,14 +17,14 @@ const getUser = (headers) => {
 
 module.exports = async(redis) => {
   const hashMap = new HashMap(redis)
-  await hashMap.connect()
+  await redis.connect()
 
   router.post('/set',
     bodyValidator('key').isString()
       .notEmpty(),
     bodyValidator('value').isString()
       .notEmpty(),
-    (req, res) => {
+    async(req, res) => {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
@@ -36,7 +36,7 @@ module.exports = async(redis) => {
       const user = getUser(headers)
       logger.info({ value, key, user }, 'SET value')
 
-      hashMap.set(key, value, user)
+      await hashMap.set(key, value, user)
 
       res.status(204).send()
     })

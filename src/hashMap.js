@@ -4,18 +4,6 @@ class HashMap {
     this.redisClient = redis
   }
 
-  async flushAll() {
-    await this.redisClient.flushAll()
-  }
-
-  async connect() {
-    await this.redisClient.connect()
-  }
-
-  async disconnect() {
-    await this.redisClient.disconnect()
-  }
-
   async set(key, value, inputUser) {
     if (!inputUser) {
       throw new Error('Input user cannot be empty')

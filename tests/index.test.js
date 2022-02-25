@@ -2,10 +2,18 @@
 
 const basicAuth = require('express-basic-auth')
 const bodyParser = require('body-parser')
-const routes = require('../routes')
+const routesBuilder = require('../routes')
+const { createClient } = require('redis')
 const express = require('express')
 const tap = require('tap')
+const conf = require('./conf')
 
+const {
+  REDIS_URL,
+} = conf
+const redisClient = createClient({
+  url: REDIS_URL,
+})
 const app = express()
 app.use(basicAuth({
   users: {
@@ -19,7 +27,9 @@ const request = require('supertest')
 const user1Auth = 'dXNlcjpwYXNzd29yZA=='
 const user2Auth = 'dXNlcjI6cGFzc3dvcmQy'
 
-tap.test('HashMap', test => {
+tap.test('HashMap', async test => {
+  const routes = await routesBuilder(redisClient)
+
   test.test('set a value', async testCase => {
     app.use(routes)
     const response = await request(app)
@@ -50,10 +60,16 @@ tap.test('HashMap', test => {
 
     testCase.end()
   })
+
+  test.teardown(async() => {
+    await redisClient.disconnect()
+  })
   test.end()
 })
 
 tap.test('HashMap - basic auth', async test => {
+  const routes = await routesBuilder(redisClient)
+
   test.test('unauthorized get', async testCase => {
     const key = 'key1'
 
@@ -103,5 +119,8 @@ tap.test('HashMap - basic auth', async test => {
     testCase.end()
   })
 
+  test.teardown(async() => {
+    await redisClient.disconnect()
+  })
   test.end()
 })
