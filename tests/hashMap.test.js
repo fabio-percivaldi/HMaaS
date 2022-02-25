@@ -12,32 +12,30 @@ const redisClient = createClient({
   url: REDIS_URL,
 })
 
-tap.test('HashMap - set', test => {
+tap.test('HashMap - set', async test => {
+  const hashMap = new HashMap(redisClient)
+  await hashMap.connect()
+
   test.test('set a value', async testCase => {
     const expectedResult = 'value'
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
+
     await hashMap.flushAll()
 
     const actualResult = await hashMap.set('key', 'value', 'user1')
 
     testCase.equal(actualResult, expectedResult)
 
-    await hashMap.disconnect()
     testCase.end()
   })
 
   test.test('set a different value', async testCase => {
     const expectedResult = 'different_value'
 
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
     await hashMap.flushAll()
 
     const actualResult = await hashMap.set('key', 'different_value', 'user1')
 
     testCase.equal(actualResult, expectedResult)
-    await hashMap.disconnect()
     testCase.end()
   })
 
@@ -45,8 +43,6 @@ tap.test('HashMap - set', test => {
     const expectedResult1 = 'value1'
     const expectedResult2 = 'value2'
 
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
     await hashMap.flushAll()
 
     const actualResult1 = await hashMap.set('key', 'value1', 'user1')
@@ -54,56 +50,59 @@ tap.test('HashMap - set', test => {
 
     testCase.equal(actualResult1, expectedResult1)
     testCase.equal(actualResult2, expectedResult2)
-    await hashMap.disconnect()
     testCase.end()
   })
 
   test.test('set a value with user', async testCase => {
     const expectedResult = 'value'
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
+
     await hashMap.flushAll()
 
     const actualResult = await hashMap.set('key', 'value', 'user1')
 
     testCase.equal(actualResult, expectedResult)
-    await hashMap.disconnect()
     testCase.end()
+  })
+
+  test.teardown(async() => {
+    await hashMap.disconnect()
   })
   test.end()
 })
 
-tap.test('HashMap - get', test => {
+tap.test('HashMap - get', async test => {
+  const hashMap = new HashMap(redisClient)
+  await hashMap.connect()
+
   test.test('get a non existing value', async testCase => {
     const expectedResult = null
 
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
     await hashMap.flushAll()
 
     const actualResult = await hashMap.get('key', 'user1')
 
     testCase.equal(actualResult, expectedResult)
-    await hashMap.disconnect()
     testCase.end()
   })
-
+  test.teardown(async() => {
+    await hashMap.disconnect()
+  })
   test.end()
 })
 
-tap.test('HashMap - set and get - ', test => {
+tap.test('HashMap - set and get - ', async test => {
+  const hashMap = new HashMap(redisClient)
+  await hashMap.connect()
+
   test.test('set a value and get it', async testCase => {
     const expectedResult = 'value'
 
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
     await hashMap.flushAll()
 
     await hashMap.set('key', 'value', 'user1')
     const actualResult = await hashMap.get('key', 'user1')
 
     testCase.equal(actualResult, expectedResult)
-    await hashMap.disconnect()
     testCase.end()
   })
 
@@ -111,8 +110,6 @@ tap.test('HashMap - set and get - ', test => {
     const expectedResult1 = 'value1'
     const expectedResult2 = 'value2'
 
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
     await hashMap.flushAll()
 
     await hashMap.set('key1', 'value1', 'user1')
@@ -123,33 +120,35 @@ tap.test('HashMap - set and get - ', test => {
 
     testCase.equal(actualResult1, expectedResult1)
     testCase.equal(actualResult2, expectedResult2)
-    await hashMap.disconnect()
     testCase.end()
   })
 
   test.test('set a value with user and get it with wrong user', async testCase => {
     const expectedResult = null
 
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
     await hashMap.flushAll()
 
     await hashMap.set('key', 'value', 'user1')
     const actualResult = await hashMap.get('key', 'user2')
 
     testCase.equal(actualResult, expectedResult)
-    await hashMap.disconnect()
     testCase.end()
+  })
+
+  test.teardown(async() => {
+    await hashMap.disconnect()
   })
   test.end()
 })
 
 tap.test('HashMap - Redis persistency', async test => {
+  const hashMap = new HashMap(redisClient)
+  await hashMap.connect()
+
   test.test('value is stored in Redis', async testCase => {
     const key = 'key1'
     const value = 'value1'
-    const hashMap = new HashMap(redisClient)
-    await hashMap.connect()
+
     await hashMap.flushAll()
 
     await hashMap.set(key, value, 'user1')
@@ -158,8 +157,11 @@ tap.test('HashMap - Redis persistency', async test => {
     const { value: actualValue } = JSON.parse(redisValue)
 
     testCase.equal(actualValue, value)
-    await hashMap.disconnect()
     testCase.end()
+  })
+
+  test.teardown(async() => {
+    await hashMap.disconnect()
   })
 
   test.end()
