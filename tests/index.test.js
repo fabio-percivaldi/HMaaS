@@ -59,6 +59,18 @@ tap.test('HashMap', async test => {
     testCase.end()
   })
 
+  test.test('set a value - incorrect body', async testCase => {
+    app.use(routes)
+    const response = await request(app)
+      .post('/set')
+      .send({ wrong_key: 'key1', value: 'value1' })
+      .set('Accept', 'application/json')
+      .set('Authorization', `Basic ${user1Auth}`)
+
+    testCase.equal(response.status, 400)
+    testCase.end()
+  })
+
   test.test('set a value and get it', async testCase => {
     const key = 'key1'
     app.use(routes)
