@@ -15,7 +15,7 @@ const getUser = (headers) => {
   return basicAuthDecoded.split(':')[0]
 }
 
-module.exports = async(redis) => {
+module.exports = async(redis, register, getCounter, setCounter) => {
   const hashMap = new HashMap(redis)
   await redis.connect()
 
@@ -36,6 +36,7 @@ module.exports = async(redis) => {
       const user = getUser(headers)
       logger.info({ value, key, user }, 'SET value')
 
+      setCounter.inc({ user })
       await hashMap.set(key, value, user)
 
       res.status(204).send()
@@ -47,12 +48,19 @@ module.exports = async(redis) => {
 
     const value = await hashMap.get(params.key, user)
     logger.info({ value, key: params.key, user }, 'GET value')
+    getCounter.inc({ user })
 
     if (!value) {
       res.status(404).send()
       return
     }
+
     res.status(200).send(value)
+  })
+
+  router.get('/-/metrics', async(req, res) => {
+    const metrics = await register.metrics()
+    res.send(metrics)
   })
   return router
 }
