@@ -14,5 +14,14 @@ tap.test('calculate user', test => {
     testCase.end()
   })
 
+  test.test('multiple users are passed', testCase => {
+    const users = 'user1:password1,user2:password2'
+    const expectedResult = { user1: 'password1', user2: 'password2' }
+    const actualResult = calculateUsers(users)
+
+    testCase.strictSame(actualResult, expectedResult)
+    testCase.end()
+  })
+
   test.end()
 })
