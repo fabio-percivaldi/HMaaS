@@ -2,6 +2,9 @@
 
 
 const calculateUsers = (users) => {
+  if (!users) {
+    return {}
+  }
   const separatedUsers = {}
   users.split(',').forEach(user => {
     const splittedUser = user.split(':')
