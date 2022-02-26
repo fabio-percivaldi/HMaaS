@@ -30,7 +30,6 @@ module.exports = async(redis, register, getCounter, setCounter) => {
         return res.status(400).json({ errors: errors.array() })
       }
       const { body, headers } = req
-      logger.info('Request body', JSON.stringify(body))
       const { key, value } = body
 
       const user = getUser(headers)
