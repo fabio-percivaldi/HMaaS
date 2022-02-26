@@ -24,6 +24,12 @@ Enabled users are provided as a list of user:password values separated by a comm
 USERS=user1:password1,user2:password2
 ```
 
+## Metrics
+On the route `/-/metrics` are exposed Prometheus metrics
+
+## Swagger
+On the route `/api/docs` is exposed the swagger of the API
+
 TODOS:
 ~~refactoring dei test~~
 ~~usare funzioni di redis da hasmap e non funzioni wrapper~~
