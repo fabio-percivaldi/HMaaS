@@ -153,8 +153,7 @@ tap.test('HashMap - Redis persistency', async test => {
 
     await hashMap.set(key, value, 'user1')
 
-    const redisValue = await redisClient.get(key)
-    const { value: actualValue } = JSON.parse(redisValue)
+    const actualValue = await redisClient.get(`user1_${key}`)
 
     testCase.equal(actualValue, value)
     testCase.end()

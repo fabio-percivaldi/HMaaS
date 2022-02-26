@@ -8,7 +8,7 @@ class HashMap {
     if (!inputUser) {
       throw new Error('Input user cannot be empty')
     }
-    await this.redisClient.set(key, JSON.stringify({ value, user: inputUser }))
+    await this.redisClient.set(`${inputUser}_${key}`, value)
     return value
   }
 
@@ -16,15 +16,9 @@ class HashMap {
     if (!inputUser) {
       throw new Error('Input user cannot be empty')
     }
-    const foundValue = await this.redisClient.get(key)
-    if (!foundValue) {
-      return null
-    }
-    const { value, user } = JSON.parse(foundValue)
-    if (inputUser !== user) {
-      return null
-    }
-    return value
+    const value = await this.redisClient.get(`${inputUser}_${key}`)
+
+    return value ? value : null
   }
 }
 

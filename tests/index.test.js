@@ -23,12 +23,29 @@ app.use(basicAuth({
 }))
 app.use(bodyParser.json())
 
+const mockRegister = {
+  metrics: () => {
+    return new Promise()
+  },
+}
+const mockGetCounter = {
+  inc: () => {
+    return null
+  },
+}
+
+const mockSetCounter = {
+  inc: () => {
+    return null
+  },
+}
+
 const request = require('supertest')
 const user1Auth = 'dXNlcjpwYXNzd29yZA=='
 const user2Auth = 'dXNlcjI6cGFzc3dvcmQy'
 
 tap.test('HashMap', async test => {
-  const routes = await routesBuilder(redisClient)
+  const routes = await routesBuilder(redisClient, mockRegister, mockGetCounter, mockSetCounter)
 
   test.test('set a value', async testCase => {
     app.use(routes)
@@ -68,7 +85,7 @@ tap.test('HashMap', async test => {
 })
 
 tap.test('HashMap - basic auth', async test => {
-  const routes = await routesBuilder(redisClient)
+  const routes = await routesBuilder(redisClient, mockRegister, mockGetCounter, mockSetCounter)
 
   test.test('unauthorized get', async testCase => {
     const key = 'key1'
