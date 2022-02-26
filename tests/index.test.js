@@ -23,10 +23,15 @@ app.use(basicAuth({
 }))
 app.use(bodyParser.json())
 
-const mockRegister = {
-  metrics: async() => {
-    return new Promise().resolve()
-  },
+const mockRegister = (metrics) => {
+  const returnMetrics = metrics
+  return {
+    metrics: async() => {
+      return new Promise(res => {
+        res(returnMetrics)
+      })
+    },
+  }
 }
 const mockGetCounter = {
   inc: () => {
@@ -43,9 +48,10 @@ const mockSetCounter = {
 const request = require('supertest')
 const user1Auth = 'dXNlcjpwYXNzd29yZA=='
 const user2Auth = 'dXNlcjI6cGFzc3dvcmQy'
+const expectedResult = 'expected_metrics'
 
 tap.test('HashMap', async test => {
-  const routes = await routesBuilder(redisClient, mockRegister, mockGetCounter, mockSetCounter)
+  const routes = await routesBuilder(redisClient, mockRegister(expectedResult), mockGetCounter, mockSetCounter)
 
   test.test('set a value', async testCase => {
     app.use(routes)
@@ -97,7 +103,7 @@ tap.test('HashMap', async test => {
 })
 
 tap.test('HashMap - basic auth', async test => {
-  const routes = await routesBuilder(redisClient, mockRegister, mockGetCounter, mockSetCounter)
+  const routes = await routesBuilder(redisClient, mockRegister(expectedResult), mockGetCounter, mockSetCounter)
 
   test.test('unauthorized get', async testCase => {
     const key = 'key1'
@@ -145,6 +151,31 @@ tap.test('HashMap - basic auth', async test => {
 
     testCase.equal(response.status, 404)
 
+    testCase.end()
+  })
+
+  test.teardown(async() => {
+    await redisClient.disconnect()
+  })
+  test.end()
+})
+
+tap.test('Prometheus - metrics', async test => {
+  test.test('get metric', async testCase => {
+    const routes = await routesBuilder(redisClient, mockRegister(expectedResult), mockGetCounter, mockSetCounter)
+    const key = 'key1'
+    app.use(routes)
+
+    await request(app)
+      .get(`/get/${key}`)
+      .set('Authorization', `Basic ${user1Auth}`)
+
+    const response = await request(app)
+      .get(`/-/metrics`)
+      .set('Authorization', `Basic ${user1Auth}`)
+
+    const { text: metrics } = response
+    testCase.equal(metrics, expectedResult)
     testCase.end()
   })
 
