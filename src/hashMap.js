@@ -8,6 +8,9 @@ class HashMap {
     if (!inputUser) {
       throw new Error('Input user cannot be empty')
     }
+    // for admin mode it's better to save an object
+    // es:  await this.redisClient.set(`key`, { value, user })
+    // and check the user on the get, if admin is used the check is skipped
     await this.redisClient.set(`${inputUser}_${key}`, value)
     return value
   }
