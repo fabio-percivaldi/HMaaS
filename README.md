@@ -18,7 +18,11 @@ Finally run the service
 npm start
 ```
 
-
+## Users
+Enabled users are provided as a list of user:password values separated by a comma -> ex:
+```
+USERS=user1:password1,user2:password2
+```
 
 TODOS:
 ~~refactoring dei test~~

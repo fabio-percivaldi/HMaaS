@@ -24,8 +24,8 @@ app.use(basicAuth({
 app.use(bodyParser.json())
 
 const mockRegister = {
-  metrics: () => {
-    return new Promise()
+  metrics: async() => {
+    return new Promise().resolve()
   },
 }
 const mockGetCounter = {

@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const swaggerUi = require('swagger-ui-express')
 const swaggerDocument = require('./swagger.json')
 const basicAuth = require('express-basic-auth')
-
+const { calculateUsers } = require('./src/users')
 // PROMETHEUS setup
 const client = require('prom-client')
 const { Counter, register } = client
@@ -24,6 +24,7 @@ const setCounter = new Counter({
 const { createClient } = require('redis')
 const {
   REDIS_URL,
+  USERS,
 } = process.env
 
 const redisClient = createClient({
@@ -34,10 +35,17 @@ const port = 3000
 const logger = require('pino')()
 const routesBuilder = require('./routes')
 
+
 routesBuilder(redisClient, register, getCounter, setCounter).then(routes => {
   app.use(bodyParser.json())
+  let separatedUsers = {}
+
+  if (USERS) {
+    separatedUsers = calculateUsers(USERS)
+  }
+
   app.use(basicAuth({
-    users: { 'user': 'password', 'user2': 'password2' },
+    users: separatedUsers,
   }))
   app.use(routes)
 
