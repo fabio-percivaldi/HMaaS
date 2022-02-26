@@ -64,6 +64,19 @@ tap.test('HashMap - set', async test => {
     testCase.end()
   })
 
+  test.test('no user is passed', async testCase => {
+    await hashMap.redisClient.flushAll()
+
+    try {
+      await hashMap.set('key', 'value')
+      testCase.fail('it should throw')
+    } catch (error) {
+      testCase.pass('it should throw')
+    }
+
+    testCase.end()
+  })
+
   test.teardown(async() => {
     await hashMap.redisClient.disconnect()
   })
@@ -84,6 +97,20 @@ tap.test('HashMap - get', async test => {
     testCase.equal(actualResult, expectedResult)
     testCase.end()
   })
+
+  test.test('no user is passed', async testCase => {
+    await hashMap.redisClient.flushAll()
+
+    try {
+      await hashMap.get('key')
+      testCase.fail('it should throw')
+    } catch (error) {
+      testCase.pass('it should throw')
+    }
+
+    testCase.end()
+  })
+
   test.teardown(async() => {
     await hashMap.redisClient.disconnect()
   })
